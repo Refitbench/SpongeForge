@@ -452,7 +452,13 @@ public final class SpongeImplHooks {
 
     @Nullable
     public static PluginContainer getActiveModContainer() {
-        return (PluginContainer) Loader.instance().activeModContainer();
+        ModContainer activeModContainer = Loader.instance().activeModContainer();
+        return activeModContainer == null ? null : Sponge.getPluginManager().getPlugin(activeModContainer.getModId()).orElse(null);
+    }
+
+    public static PluginContainer getActiveModContainerOrMinecraft() {
+        PluginContainer pluginContainer = getActiveModContainer();
+        return pluginContainer != null ? pluginContainer : SpongeImpl.getMinecraftPlugin();
     }
 
     public static Text getAdditionalCommandDescriptions() {

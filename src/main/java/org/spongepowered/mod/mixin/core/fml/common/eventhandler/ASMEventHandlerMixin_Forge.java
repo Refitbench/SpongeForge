@@ -28,6 +28,7 @@ import co.aikar.timings.Timing;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.ASMEventHandler;
 import net.minecraftforge.fml.common.eventhandler.IEventListener;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,7 +48,6 @@ public abstract class ASMEventHandlerMixin_Forge implements ASMEventHandlerBridg
     private Timing timingsHandler;
     private String timingName;
 
-    @Shadow @Final private IEventListener handler;
     @Shadow private ModContainer owner;
 
     @Inject(method = "<init>(Ljava/lang/Object;Ljava/lang/reflect/Method;Lnet/minecraftforge/fml/common/ModContainer;Z)V", at = @At("RETURN"))
@@ -58,7 +58,9 @@ public abstract class ASMEventHandlerMixin_Forge implements ASMEventHandlerBridg
     @Override
     public Timing bridge$getTimingsHandler() {
         if (this.timingsHandler == null) {
-            this.timingsHandler = SpongeTimings.getModTimings((PluginContainer) this.owner, this.timingName);
+            PluginContainer pluginContainer = Sponge.getPluginManager().getPlugin(this.owner.getModId()).orElseThrow(
+                    () -> new RuntimeException("Failed to find plugin container for " + this.owner.getModId()));
+            this.timingsHandler = SpongeTimings.getModTimings(pluginContainer, this.timingName);
         }
         return this.timingsHandler;
     }

@@ -31,13 +31,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.common.bridge.inventory.ContainerBridge;
 import org.spongepowered.common.bridge.item.inventory.InventoryAdapterBridge;
-import org.spongepowered.common.item.inventory.adapter.InventoryAdapter;
 
 @Mixin(value = NetworkRegistry.class, remap = false)
 public abstract class NetworkRegistryMixin_Forge {
@@ -50,7 +49,9 @@ public abstract class NetworkRegistryMixin_Forge {
         final int z1) {
         final Object value = factory.getServerGuiElement(id, player, world, x, y, z);
         if (value instanceof Container) {
-            ((InventoryAdapterBridge) value).bridge$setPlugin((PluginContainer) mc);
+            PluginContainer pluginContainer = Sponge.getPluginManager().getPlugin(mc.getModId()).orElseThrow(
+                    () -> new RuntimeException("Failed to find plugin container for " + mc.getModId()));
+            ((InventoryAdapterBridge) value).bridge$setPlugin(pluginContainer);
         }
         return value;
     }

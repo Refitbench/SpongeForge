@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.SpongeImpl;
+import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.bridge.entity.ai.EntityAIBasesBridge;
 import org.spongepowered.common.registry.type.entity.AITaskTypeModule;
 
@@ -58,12 +59,8 @@ public abstract class EntityAIBaseMixin_Forge {
         // Handle adding mod/un-implemented Minecraft tasks.
         final Optional<AITaskType> optModType = AITaskTypeModule.getInstance().getByAIClass(getClass());
         if (!optModType.isPresent()) {
-            PluginContainer container = (PluginContainer) Loader.instance().activeModContainer();
-            // FML couldn't figure out the mod...give the task to Minecraft
-            if (container == null) {
-                // May need to log this...
-                container = SpongeImpl.getMinecraftPlugin();
-            }
+            // May need to log if container ends up being Minecraft
+            PluginContainer container = SpongeImplHooks.getActiveModContainerOrMinecraft();
             final String idAndName = getClass().getSimpleName();
             ((EntityAIBasesBridge) this).bridge$setType(AITaskTypeModule.getInstance().createAITaskType(container, idAndName, idAndName,
                     (Class<? extends AITask<? extends Agent>>) getClass()));

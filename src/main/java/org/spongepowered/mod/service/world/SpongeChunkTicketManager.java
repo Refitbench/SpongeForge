@@ -34,6 +34,8 @@ import com.google.common.collect.ListMultimap;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
+import net.minecraftforge.fml.common.ModContainer;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -64,7 +66,15 @@ public class SpongeChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public Optional<LoadingTicket> createTicket(final Object plugin, final World world) {
-        final Ticket forgeTicket = ForgeChunkManager.requestTicket(plugin, (net.minecraft.world.World) world, ForgeChunkManager.Type.NORMAL);
+        Object mod;
+        if (plugin instanceof PluginContainer) {
+            mod = ((PluginContainer) plugin).getInstance();
+        } else if (plugin instanceof ModContainer) {
+            mod = ((ModContainer) plugin).getMod();
+        } else {
+            return Optional.empty();
+        }
+        final Ticket forgeTicket = ForgeChunkManager.requestTicket(mod, (net.minecraft.world.World) world, ForgeChunkManager.Type.NORMAL);
         if (forgeTicket == null) {
             return Optional.empty();
         }
@@ -74,7 +84,15 @@ public class SpongeChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public Optional<EntityLoadingTicket> createEntityTicket(final Object plugin, final World world) {
-        final Ticket forgeTicket = ForgeChunkManager.requestTicket(plugin, (net.minecraft.world.World) world, ForgeChunkManager.Type.ENTITY);
+        Object mod;
+        if (plugin instanceof PluginContainer) {
+            mod = ((PluginContainer) plugin).getInstance();
+        } else if (plugin instanceof ModContainer) {
+            mod = ((ModContainer) plugin).getMod();
+        } else {
+            return Optional.empty();
+        }
+        final Ticket forgeTicket = ForgeChunkManager.requestTicket(mod, (net.minecraft.world.World) world, ForgeChunkManager.Type.ENTITY);
         if (forgeTicket == null) {
             return Optional.empty();
         }
@@ -89,9 +107,16 @@ public class SpongeChunkTicketManager implements ChunkTicketManager {
             return Optional.empty();
         }
 
-        final Ticket forgeTicket =
-                ForgeChunkManager.requestPlayerTicket(plugin, spongePlayer.get().getName(), (net.minecraft.world.World) world,
-                        ForgeChunkManager.Type.NORMAL);
+        Object mod;
+        if (plugin instanceof PluginContainer) {
+            mod = ((PluginContainer) plugin).getInstance();
+        } else if (plugin instanceof ModContainer) {
+            mod = ((ModContainer) plugin).getMod();
+        } else {
+            return Optional.empty();
+        }
+        final Ticket forgeTicket = ForgeChunkManager.requestPlayerTicket(mod, spongePlayer.get().getName(),
+                (net.minecraft.world.World) world, ForgeChunkManager.Type.NORMAL);
         if (forgeTicket == null) {
             return Optional.empty();
         }
@@ -106,9 +131,16 @@ public class SpongeChunkTicketManager implements ChunkTicketManager {
             return Optional.empty();
         }
 
-        final Ticket forgeTicket =
-                ForgeChunkManager.requestPlayerTicket(plugin, spongePlayer.get().getName(), (net.minecraft.world.World) world,
-                        ForgeChunkManager.Type.ENTITY);
+        Object mod;
+        if (plugin instanceof PluginContainer) {
+            mod = ((PluginContainer) plugin).getInstance();
+        } else if (plugin instanceof ModContainer) {
+            mod = ((ModContainer) plugin).getMod();
+        } else {
+            return Optional.empty();
+        }
+        final Ticket forgeTicket = ForgeChunkManager.requestPlayerTicket(mod, spongePlayer.get().getName(),
+                (net.minecraft.world.World) world, ForgeChunkManager.Type.ENTITY);
         if (forgeTicket == null) {
             return Optional.empty();
         }
@@ -118,12 +150,33 @@ public class SpongeChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public int getMaxTickets(final Object plugin) {
-        return ForgeChunkManager.getMaxTicketLengthFor(((PluginContainer) plugin).getId());
+        String id;
+        if (plugin instanceof PluginContainer) {
+            id = ((PluginContainer) plugin).getId();
+        } else if (plugin instanceof ModContainer) {
+            id = ((ModContainer) plugin).getModId();
+        } else {
+            return ForgeChunkManager.getMaxTicketLengthFor(Sponge.getPluginManager().fromInstance(plugin)
+                    .map(PluginContainer::getId)
+                    .orElseThrow(() -> new RuntimeException("Invalid plugin: " + plugin)));
+        }
+        return ForgeChunkManager.getMaxTicketLengthFor(Sponge.getPluginManager().getPlugin(id)
+                .map(PluginContainer::getId)
+                .orElseThrow(() -> new RuntimeException("Failed to find plugin container for " + id)));
     }
 
     @Override
     public int getAvailableTickets(final Object plugin, final World world) {
-        return ForgeChunkManager.ticketCountAvailableFor(plugin, (net.minecraft.world.World) world);
+        Object mod;
+        if (plugin instanceof PluginContainer) {
+            mod = ((PluginContainer) plugin).getInstance();
+        } else if (plugin instanceof ModContainer) {
+            mod = ((ModContainer) plugin).getMod();
+        } else {
+            // TODO throw?
+            return 0; // Default ticketCountAvailableFor return
+        }
+        return ForgeChunkManager.ticketCountAvailableFor(mod, (net.minecraft.world.World) world);
     }
 
     @Override

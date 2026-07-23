@@ -273,7 +273,8 @@ public class SpongeMod extends MetaModContainer {
         SpongeForgeModuleRegistry.registerForgeData();
 
         this.game.getEventManager().registerListeners(this, this);
-        SpongeImpl.getInternalPlugins().add((PluginContainer) ForgeModContainer.getInstance());
+        SpongeImpl.getInternalPlugins().add(Sponge.getPluginManager().getPlugin("forge").orElseThrow(
+                () -> new RuntimeException("Could not find plugin container for forge")));
     }
 
     @Override

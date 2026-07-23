@@ -27,11 +27,9 @@ package org.spongepowered.mod.mixin.core.command;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ServerCommandManager;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.command.MinecraftCommandWrapper;
 import org.spongepowered.common.bridge.command.ServerCommandManagerBridge;
 import org.spongepowered.mod.command.ForgeMinecraftCommandWrapper;
@@ -42,11 +40,6 @@ public abstract class ServerCommandManagerMixin_Forge extends CommandHandler imp
 
     @Override
     public MinecraftCommandWrapper bridge$wrapCommand(final ICommand command) {
-        ModContainer activeContainer = Loader.instance().activeModContainer();
-        if (activeContainer == null) {
-            activeContainer = Loader.instance().getMinecraftModContainer();
-        }
-
-        return new ForgeMinecraftCommandWrapper((PluginContainer) activeContainer, command);
+        return new ForgeMinecraftCommandWrapper(SpongeImplHooks.getActiveModContainerOrMinecraft(), command);
     }
 }

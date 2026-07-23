@@ -66,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// PluginContainer is implemented indirectly through the mixin to ModContainer
 public class SpongeModPluginContainer implements ModContainer, PluginContainerExtension {
 
     // This is the implementation (SpongeForge) injector.
@@ -88,7 +87,6 @@ public class SpongeModPluginContainer implements ModContainer, PluginContainerEx
 
     private Injector injector;
 
-    private PluginContainer pluginContainer = (PluginContainer) (Object) this;
     private static final String ID_WARNING = "Plugin IDs should be lowercase, and only contain characters from "
             + "a-z, dashes or underscores, start with a lowercase letter, and not exceed 64 characters.";
 
@@ -279,7 +277,7 @@ public class SpongeModPluginContainer implements ModContainer, PluginContainerEx
 
             Class<?> pluginClazz = Class.forName(this.className, true, modClassLoader);
 
-            Injector injector = spongeInjector.getParent().createChildInjector(new PluginModule((PluginContainer) this, pluginClazz));
+            Injector injector = spongeInjector.getParent().createChildInjector(new PluginModule(this.getPluginContainer(), pluginClazz));
             this.injector = injector;
             this.instance = injector.getInstance(pluginClazz);
 
@@ -401,15 +399,22 @@ public class SpongeModPluginContainer implements ModContainer, PluginContainerEx
 
     @Override
     public final String toString() {
+        PluginContainer pluginContainer = this.getPluginContainer();
         return MoreObjects.toStringHelper("Plugin")
                 .omitNullValues()
-                .add("id", this.pluginContainer.getId())
-                .add("name", this.pluginContainer.getName())
-                .add("version", this.pluginContainer.getVersion().orElse(null))
-                .add("description", this.pluginContainer.getDescription().orElse(null))
-                .add("url", this.pluginContainer.getUrl().orElse(null))
-                .add("authors", this.pluginContainer.getAuthors().isEmpty() ? null : this.pluginContainer.getAuthors())
-                .add("source", this.pluginContainer.getSource().orElse(null))
+                .add("id", pluginContainer.getId())
+                .add("name", pluginContainer.getName())
+                .add("version", pluginContainer.getVersion().orElse(null))
+                .add("description", pluginContainer.getDescription().orElse(null))
+                .add("url", pluginContainer.getUrl().orElse(null))
+                .add("authors", pluginContainer.getAuthors().isEmpty() ? null : pluginContainer.getAuthors())
+                .add("source", pluginContainer.getSource().orElse(null))
                 .toString();
     }
+
+    private PluginContainer getPluginContainer() {
+        return Sponge.getPluginManager().getPlugin(this.id).orElseThrow(
+                () -> new RuntimeException("Failed to find plugin container for " + this.id));
+    }
+
 }

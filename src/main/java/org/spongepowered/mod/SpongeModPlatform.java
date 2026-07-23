@@ -29,8 +29,8 @@ import com.google.inject.Singleton;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.SpongePlatform;
 
 @Singleton
@@ -38,7 +38,7 @@ public final class SpongeModPlatform extends SpongePlatform {
 
     @Inject
     public SpongeModPlatform(final PluginManager manager, final MinecraftVersion minecraftVersion) {
-        super(manager, (PluginContainer) SpongeMod.instance, minecraftVersion);
+        super(manager, SpongeImpl.getSpongePlugin(), minecraftVersion);
         this.platformMap.put("ForgeVersion", ForgeVersion.getVersion());
     }
 
