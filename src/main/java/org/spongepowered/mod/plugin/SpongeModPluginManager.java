@@ -28,43 +28,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.emptyToNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Singleton;
+import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.common.SpongeImpl;
+import org.spongepowered.common.SpongeImplHooks;
+import org.spongepowered.common.SpongePlatform;
+import org.spongepowered.mod.SpongeModMetadata;
 import org.spongepowered.plugin.meta.PluginDependency;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.annotation.Nullable;
+import java.util.*;
 
 @NonnullByDefault
 @Singleton
 public class SpongeModPluginManager implements PluginManager {
 
-    @Nullable
-    private Map<String, PluginContainer> containers;
-
     private Map<String, PluginContainer> getContainers() {
-        if (this.containers == null) {
-            ImmutableMap.Builder<String, PluginContainer> containerBuilder = ImmutableMap.builder();
-            for (ModContainer mod : Loader.instance().getActiveModList()) {
-                PluginContainer pluginContainer = new ModPluginContainer(mod);
-                containerBuilder.put(mod.getModId(), pluginContainer);
-            }
-            this.containers = containerBuilder.build();
+        Map<String, PluginContainer> containers = new HashMap<>();
+
+        // These can be overridden later
+        containers.put(SpongeImplHooks.getImplementationId(), new ModPluginContainer(new DummyModContainer(SpongeModMetadata.SPONGE_FORGE_METADATA)));
+        containers.put(SpongePlatform.API_ID, new ModPluginContainer(new DummyModContainer(SpongeModMetadata.SPONGE_API_METADATA)));
+        containers.put(SpongeImpl.ECOSYSTEM_ID, new ModPluginContainer(new DummyModContainer(SpongeModMetadata.SPONGE_COMMONS_METADATA)));
+
+        for (ModContainer mod : Loader.instance().getModList()) {
+            PluginContainer pluginContainer = new ModPluginContainer(mod);
+            containers.put(mod.getModId(), pluginContainer);
         }
-        return this.containers;
+        return containers;
     }
 
     @Override
@@ -83,9 +81,12 @@ public class SpongeModPluginManager implements PluginManager {
         if (instance instanceof PluginContainer) {
             return Optional.of((PluginContainer) instance);
         }
+        if (instance instanceof ModContainer) {
+            return Optional.of(new ModPluginContainer((ModContainer) instance));
+        }
         ModContainer container = Loader.instance().getReversedModObjectList().get(instance);
         if (container != null) {
-            return Optional.ofNullable(this.getContainers().get(container.getModId()));
+            return Optional.of(new ModPluginContainer(container));
         }
         return Optional.empty();
     }

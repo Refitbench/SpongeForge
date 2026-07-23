@@ -165,7 +165,7 @@ public class SpongeMod extends MetaModContainer {
     private ASMDataTable data;
 
     public SpongeMod() throws Exception {
-        super(SpongeModMetadata.getSpongeForgeMetadata());
+        super(SpongeModMetadata.SPONGE_FORGE_METADATA);
 
         // Register our special instance creator with FML
         ModContainerFactory.instance().registerContainerType(Type.getType(Plugin.class), SpongeModPluginContainer.class);

@@ -41,10 +41,7 @@ import java.util.Map;
 @Singleton
 public class SpongePlatform implements Platform {
 
-    private final PluginContainer api;
-    private final PluginContainer common;
-    private final PluginContainer impl;
-    private final PluginContainer minecraft;
+    private final PluginManager manager;
     private final MinecraftVersion minecraftVersion;
 
     protected final Map<String, Object> platformMap = new HashMap<String, Object>() {
@@ -65,19 +62,18 @@ public class SpongePlatform implements Platform {
 
     // For SpongeForge (implementation container isn't registered when SpongePlatform is initialized)
     protected SpongePlatform(PluginManager manager, PluginContainer impl, MinecraftVersion minecraftVersion) {
-        this.api = manager.getPlugin(Platform.API_ID).get();
-        this.common = manager.getPlugin(SpongeImpl.ECOSYSTEM_ID).get();
-        this.impl = checkNotNull(impl, "impl");
-        this.minecraft = manager.getPlugin(SpongeImpl.GAME_ID).get();
+        this.manager = manager;
+        PluginContainer api = manager.getPlugin(Platform.API_ID).get();
+        PluginContainer common = manager.getPlugin(SpongeImpl.ECOSYSTEM_ID).get();
         this.minecraftVersion = checkNotNull(minecraftVersion, "minecraftVersion");
 
         this.platformMap.put("Type", this.getType());
-        this.platformMap.put("ApiName", this.api.getName());
-        this.platformMap.put("ApiVersion", this.api.getVersion());
-        this.platformMap.put("CommonName", this.common.getName());
-        this.platformMap.put("CommonVersion", this.common.getVersion());
-        this.platformMap.put("ImplementationName", this.impl.getName());
-        this.platformMap.put("ImplementationVersion", this.impl.getVersion());
+        this.platformMap.put("ApiName", api.getName());
+        this.platformMap.put("ApiVersion", api.getVersion());
+        this.platformMap.put("CommonName", common.getName());
+        this.platformMap.put("CommonVersion", common.getVersion());
+        this.platformMap.put("ImplementationName", impl.getName());
+        this.platformMap.put("ImplementationVersion", impl.getVersion());
         this.platformMap.put("MinecraftVersion", this.getMinecraftVersion());
     }
 
@@ -85,7 +81,7 @@ public class SpongePlatform implements Platform {
     // SpongeForge overrides this to return CLIENT when running in a client environment
 
     public PluginContainer getCommon() {
-        return this.common;
+        return manager.getPlugin(SpongeImpl.ECOSYSTEM_ID).get();
     }
 
     @Override
@@ -102,11 +98,11 @@ public class SpongePlatform implements Platform {
     public PluginContainer getContainer(Component component) {
         switch (component) {
             case API:
-                return this.api;
+                return manager.getPlugin(Platform.API_ID).get();
             case IMPLEMENTATION:
-                return this.impl;
+                return manager.getPlugin(SpongeImplHooks.getImplementationId()).get();
             case GAME:
-                return this.minecraft;
+                return manager.getPlugin(SpongeImpl.GAME_ID).get();
             default:
                 throw new AssertionError("Unknown platform component: " + component);
         }
@@ -125,11 +121,11 @@ public class SpongePlatform implements Platform {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", getType())
-                .add("executionType", getExecutionType())
-                .add("api", this.api)
-                .add("impl", this.impl)
-                .add("minecraftVersion", getMinecraftVersion())
+                .add("type", this.getType())
+                .add("executionType", this.getExecutionType())
+                .add("api", this.getContainer(Component.API))
+                .add("impl", this.getContainer(Component.IMPLEMENTATION))
+                .add("minecraftVersion", this.getMinecraftVersion())
                 .toString();
     }
 

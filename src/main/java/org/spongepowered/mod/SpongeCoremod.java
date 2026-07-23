@@ -102,6 +102,9 @@ public class SpongeCoremod implements IFMLLoadingPlugin {
         if (modFile == null) {
             modFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
         }
+
+        FMLInjectionData.containers.add("org.spongepowered.mod.SpongeModMetadata$SpongeApiMod");
+        FMLInjectionData.containers.add("org.spongepowered.mod.SpongeModMetadata$SpongeCommonsMod");
     }
 
     @Override

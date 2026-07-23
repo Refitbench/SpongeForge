@@ -24,8 +24,13 @@
  */
 package org.spongepowered.mod;
 
+import com.google.common.eventbus.EventBus;
+import net.minecraftforge.fml.common.DummyModContainer;
+import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.common.ModMetadata;
+import org.spongepowered.common.SpongeImpl;
+import org.spongepowered.common.SpongePlatform;
 import org.spongepowered.spongeforge.Tags;
 
 import java.io.IOException;
@@ -36,20 +41,56 @@ import java.util.zip.ZipEntry;
 
 public final class SpongeModMetadata {
 
-    public static ModMetadata getSpongeForgeMetadata() {
+    public static final ModMetadata SPONGE_FORGE_METADATA, SPONGE_API_METADATA, SPONGE_COMMONS_METADATA;
+
+    static {
+        ModMetadata[] metadata = getSpongeForgeMetadata();
+        SPONGE_FORGE_METADATA = metadata[0];
+        SPONGE_API_METADATA = metadata[1];
+        SPONGE_COMMONS_METADATA = metadata[2];
+    }
+
+    private static ModMetadata[] getSpongeForgeMetadata() {
         try (JarFile jar = new JarFile(SpongeCoremod.modFile)) {
             ZipEntry modInfo = jar.getEntry("mcmod.info");
             try (InputStream inputStream = jar.getInputStream(modInfo)) {
-                return MetadataCollection.from(inputStream, Tags.MOD_ID).getMetadataForId(Tags.MOD_ID, Collections.emptyMap());
+                MetadataCollection metadataCollection = MetadataCollection.from(inputStream, Tags.MOD_ID);
+
+                ModMetadata spongeForge = metadataCollection.getMetadataForId(Tags.MOD_ID, Collections.emptyMap());
+                ModMetadata spongeApi = metadataCollection.getMetadataForId(SpongePlatform.API_ID, Collections.emptyMap());
+                ModMetadata spongeCommons = metadataCollection.getMetadataForId(SpongeImpl.ECOSYSTEM_ID, Collections.emptyMap());
+
+                return new ModMetadata[] { spongeForge, spongeApi, spongeCommons };
             }
         } catch (IOException e) {
-            ModMetadata meta = new ModMetadata();
-            meta.modId = Tags.MOD_ID;
-            meta.name = Tags.MOD_NAME;
-            meta.version = Tags.VERSION;
-            meta.authorList.add("Rongmario");
-            return meta;
+            throw new RuntimeException("Unable to process metadata", e);
         }
+    }
+
+    public static class SpongeApiMod extends DummyModContainer {
+
+        public SpongeApiMod() {
+            super(SPONGE_API_METADATA);
+        }
+
+        @Override
+        public boolean registerBus(EventBus bus, LoadController controller) {
+            return true;
+        }
+
+    }
+
+    public static class SpongeCommonsMod extends DummyModContainer {
+
+        public SpongeCommonsMod() {
+            super(SPONGE_COMMONS_METADATA);
+        }
+
+        @Override
+        public boolean registerBus(EventBus bus, LoadController controller) {
+            return true;
+        }
+
     }
 
 }

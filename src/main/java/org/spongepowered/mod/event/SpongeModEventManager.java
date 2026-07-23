@@ -67,6 +67,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -367,12 +368,13 @@ public class SpongeModEventManager extends SpongeEventManager {
     public boolean post(Event event, List<RegisteredListener<?>> listeners, boolean beforeModifications, boolean forced,
             boolean useCauseStackManager) {
         ModContainer oldContainer = ((LoadControllerBridge_Forge) SpongeMod.instance.getController()).forgeBridge$getActiveModContainer();
-        for (@SuppressWarnings("rawtypes")
-        RegisteredListener listener : listeners) {
-            ((LoadControllerBridge_Forge) SpongeMod.instance.getController()).forgeBridge$setActiveModContainer((ModContainer) listener.getPlugin());
+        for (@SuppressWarnings("rawtypes") RegisteredListener listener : listeners) {
+            ModContainer modContainer = Loader.instance().getIndexedModList().get(listener.getPlugin().getId());
+            if (modContainer != null) {
+                ((LoadControllerBridge_Forge) SpongeMod.instance.getController()).forgeBridge$setActiveModContainer(modContainer);
+            }
             try {
-                if (forced || (!listener.isBeforeModifications() && !beforeModifications)
-                        || (listener.isBeforeModifications() && beforeModifications)) {
+                if (forced || (!listener.isBeforeModifications() && !beforeModifications) || (listener.isBeforeModifications() && beforeModifications)) {
                     listener.getTimingsHandler().startTimingIfSync();
                     if (event instanceof AbstractEvent) {
                         ((AbstractEvent) event).currentOrder = listener.getOrder();
