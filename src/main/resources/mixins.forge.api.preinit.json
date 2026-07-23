@@ -6,7 +6,6 @@
     "target": "@env(PREINIT)",
     "compatibilityLevel": "JAVA_8",
     "mixins": [
-        "fml.common.ModContainerMixin_ForgeAPI",
         "fml.common.eventhandler.EventMixin_ForgeAPI",
         "fml.common.event.FMLEventMixin_ForgeAPI"
     ],

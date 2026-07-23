@@ -25,42 +25,56 @@
 package org.spongepowered.mod.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.emptyToNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Singleton;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.ModMetadata;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.plugin.meta.PluginDependency;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 @Singleton
 public class SpongeModPluginManager implements PluginManager {
 
-    @Override
-    public Optional<PluginContainer> getPlugin(String id) {
-        checkNotNull(id, "id");
-        ModContainer container = Loader.instance().getIndexedModList().get(id);
-        if (container == null) {
-            for (ModContainer mod : Loader.instance().getModList()) {
-                if (mod.getModId().equalsIgnoreCase(id)) {
-                    container = mod;
-                    break;
-                }
+    @Nullable
+    private Map<String, PluginContainer> containers;
+
+    private Map<String, PluginContainer> getContainers() {
+        if (this.containers == null) {
+            ImmutableMap.Builder<String, PluginContainer> containerBuilder = ImmutableMap.builder();
+            for (ModContainer mod : Loader.instance().getActiveModList()) {
+                PluginContainer pluginContainer = new ModPluginContainer(mod);
+                containerBuilder.put(mod.getModId(), pluginContainer);
             }
+            this.containers = containerBuilder.build();
         }
-        return Optional.ofNullable((PluginContainer) container);
+        return this.containers;
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Optional<PluginContainer> getPlugin(String id) {
+        return Optional.ofNullable(this.getContainers().get(checkNotNull(id, "id")));
+    }
+
+    @Override
     public Collection<PluginContainer> getPlugins() {
-        return ImmutableList.copyOf((List) Loader.instance().getActiveModList());
+        return this.getContainers().values();
     }
 
     @Override
@@ -69,13 +83,87 @@ public class SpongeModPluginManager implements PluginManager {
         if (instance instanceof PluginContainer) {
             return Optional.of((PluginContainer) instance);
         }
-        return Optional.ofNullable((PluginContainer) Loader.instance().getReversedModObjectList().get(instance));
+        ModContainer container = Loader.instance().getReversedModObjectList().get(instance);
+        if (container != null) {
+            return Optional.ofNullable(this.getContainers().get(container.getModId()));
+        }
+        return Optional.empty();
     }
 
     @Override
     public boolean isLoaded(String id) {
-        checkNotNull(id, "id");
-        return Loader.isModLoaded(id);
+        return Loader.isModLoaded(checkNotNull(id, "id"));
+    }
+
+    private static class ModPluginContainer implements PluginContainer {
+
+        private final ModContainer modContainer;
+
+        private ModPluginContainer(ModContainer modContainer) {
+            this.modContainer = modContainer;
+        }
+
+        @Override
+        public String getId() {
+            return checkNotNull(emptyToNull(this.modContainer.getModId()), "modid");
+        }
+
+        @Override
+        public String getName() {
+            return checkNotNull(emptyToNull(this.modContainer.getName()), "name");
+        }
+
+        @Override
+        public Optional<String> getVersion() {
+            String version = emptyToNull(this.modContainer.getVersion());
+            if ("unknown".equalsIgnoreCase(version) || "dev".equalsIgnoreCase(version)) {
+                version = null;
+            }
+            return Optional.ofNullable(version);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            final ModMetadata meta = this.modContainer.getMetadata();
+            return meta != null ? Optional.ofNullable(emptyToNull(meta.description)) : Optional.empty();
+        }
+
+        @Override
+        public Optional<String> getUrl() {
+            final ModMetadata meta = this.modContainer.getMetadata();
+            return meta != null ? Optional.ofNullable(emptyToNull(meta.url)) : Optional.empty();
+        }
+
+        @Override
+        public List<String> getAuthors() {
+            final ModMetadata meta = this.modContainer.getMetadata();
+            return meta != null ? ImmutableList.copyOf(meta.authorList) : ImmutableList.of();
+        }
+
+        @Override
+        public Set<PluginDependency> getDependencies() {
+            return DependencyHandler.collectDependencies(this.modContainer);
+        }
+
+        @Override
+        public Optional<PluginDependency> getDependency(String id) {
+            return Optional.ofNullable(DependencyHandler.findDependency(this.modContainer, id));
+        }
+
+        @Override
+        public Optional<Path> getSource() {
+            final File source = this.modContainer.getSource();
+            if (source != null) {
+                return Optional.of(source.toPath());
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<?> getInstance() {
+            return Optional.ofNullable(this.modContainer.getMod());
+        }
+
     }
 
 }
