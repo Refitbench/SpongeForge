@@ -463,7 +463,7 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
 
             final String modId = tileEntityType.getId().split(":")[0];
             if ("minecraft".equalsIgnoreCase(modId) && !"minecraft".equalsIgnoreCase(tileEntityType.getModId())) {
-                if (!"sponge".equalsIgnoreCase(tileEntityType.getModId())) {
+                if (!SpongeImpl.ECOSYSTEM_ID.equalsIgnoreCase(tileEntityType.getModId())) {
                     requiredMods.add(modId);
                 }
             }
@@ -481,7 +481,7 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
             final SpongeEntityType type = (SpongeEntityType) entityArchetype.getType();
             final String modId = type.getId().split(":")[0];
             if ("minecraft".equalsIgnoreCase(modId) && !"minecraft".equalsIgnoreCase(type.getModId())) {
-                if (!"sponge".equalsIgnoreCase(type.getModId())) {
+                if (!SpongeImpl.ECOSYSTEM_ID.equalsIgnoreCase(type.getModId())) {
                     requiredMods.add(modId);
                 }
             }

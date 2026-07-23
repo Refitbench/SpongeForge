@@ -42,7 +42,7 @@ public class PlaceholderParserRegistryModule
         implements SpongeAdditionalCatalogRegistryModule<PlaceholderParser> {
 
     public PlaceholderParserRegistryModule() {
-        super("sponge");
+        super(SpongeImpl.ECOSYSTEM_ID);
     }
 
     @Override

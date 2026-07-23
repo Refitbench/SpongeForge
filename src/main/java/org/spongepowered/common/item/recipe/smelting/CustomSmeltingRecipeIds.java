@@ -24,13 +24,12 @@
  */
 package org.spongepowered.common.item.recipe.smelting;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.common.SpongeImpl;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -51,7 +50,9 @@ public final class CustomSmeltingRecipeIds {
         // Just take the current plugin from the cause stack, it will most likely
         // be the plugin constructing the recipe, fallback to sponge if it fails.
         final String pluginId = Sponge.getCauseStackManager().getCurrentCause()
-                .first(PluginContainer.class).map(PluginContainer::getId).orElse("sponge");
+                .first(PluginContainer.class)
+                .map(PluginContainer::getId)
+                .orElse(SpongeImpl.ECOSYSTEM_ID);
         return pluginId + ":" + clazz.getName().replaceAll("[.$]", "_").toLowerCase() + "_" + value;
     }
 }

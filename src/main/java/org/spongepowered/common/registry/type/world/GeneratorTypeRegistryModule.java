@@ -38,6 +38,7 @@ import org.spongepowered.api.registry.util.AdditionalRegistration;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.bridge.world.WorldTypeBridge;
 import org.spongepowered.common.mixin.core.world.WorldTypeAccessor;
 import org.spongepowered.common.registry.RegistryHelper;
@@ -112,10 +113,8 @@ public final class GeneratorTypeRegistryModule extends AbstractPrefixAlternateCa
     }
 
     private GeneratorTypeRegistryModule() {
-        super("minecraft",
-            new String[] {"minecraft", "sponge"},
-            id -> id.replace("debug_all_block_states", "debug")
-            );
+        super(SpongeImpl.GAME_ID, new String[] { SpongeImpl.GAME_ID, SpongeImpl.ECOSYSTEM_ID },
+                id -> id.replace("debug_all_block_states", "debug"));
     }
 
     @Override

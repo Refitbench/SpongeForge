@@ -48,6 +48,7 @@ import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.World;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.event.SpongeEventContextKey;
 import org.spongepowered.common.registry.type.AbstractPrefixAlternateCatalogTypeRegistryModule;
 
@@ -69,8 +70,8 @@ public final class EventContextKeysModule
     public void registerAdditionalCatalog(EventContextKey extraCatalog) {
         final String id = checkNotNull(extraCatalog).getId();
         final String key = id.toLowerCase(Locale.ENGLISH);
-        checkArgument(!key.contains("sponge:"), "Cannot register spoofed event context key!");
-        checkArgument(!key.contains("minecraft:"), "Cannot register spoofed event context key!");
+        checkArgument(!key.contains(SpongeImpl.ECOSYSTEM_ID + ":"), "Cannot register spoofed event context key!");
+        checkArgument(!key.contains(SpongeImpl.GAME_ID + ":"), "Cannot register spoofed event context key!");
         checkArgument(!this.catalogTypeMap.containsKey(key), "Cannot register an already registered EventContextKey: %s", key);
         this.catalogTypeMap.put(key, extraCatalog);
 
@@ -78,52 +79,53 @@ public final class EventContextKeysModule
 
     @Override
     public void registerDefaults() {
-        this.createKey("sponge:block_event_queue", "Block Event Queue", LocatableBlock.class);
-        this.createKey("sponge:block_event_process", "Block Event Process", LocatableBlock.class);
-        this.createKey("sponge:creator", "Creator", User.class);
-        this.createKey("sponge:damage_type", "Damage Type", DamageType.class);
-        this.createKey("sponge:dismount_type", "Dimension Type", DismountType.class);
-        this.createKey("sponge:igniter", "Igniter", User.class);
-        this.createKey("sponge:last_damage_source", "Last Damage Source", DamageSource.class);
-        this.createKey("sponge:liquid_break", "Liquid Break", World.class);
-        this.createKey("sponge:liquid_flow", "Liquid Flow", World.class);
-        this.createKey("sponge:liquid_mix", "Liquid Mix", World.class);
-        this.createKey("sponge:neighbor_notify_source", "Neighbor Notify Source", BlockSnapshot.class);
-        this.createKey("sponge:notifier", "Notifier", User.class);
-        this.createKey("sponge:owner", "Owner", User.class);
-        this.createKey("sponge:player", "Player", Player.class);
-        this.createKey("sponge:player_simulated", "Game Profile", GameProfile.class);
-        this.createKey("sponge:projectile_source", "Projectile Source", ProjectileSource.class);
-        this.createKey("sponge:service_manager", "Service Manager", ServiceManager.class);
-        this.createKey("sponge:spawn_type", "Spawn Type", SpawnType.class);
-        this.createKey("sponge:teleport_type", "Teleport Type", TeleportType.class);
-        this.createKey("sponge:thrower", "Thrower", User.class);
-        this.createKey("sponge:weapon", "Weapon", ItemStackSnapshot.class);
-        this.createKey("sponge:fake_player", "Fake Player", Player.class);
-        this.createKey("sponge:player_break", "Player Break", World.class);
-        this.createKey("sponge:player_place", "Player Place", World.class);
-        this.createKey("sponge:fire_spread", "Fire Spread", World.class);
-        this.createKey("sponge:leaves_decay", "Leaves Decay", World.class);
-        this.createKey("sponge:piston_retract", "Piston Retract", World.class);
-        this.createKey("sponge:piston_extend", "Piston Extend", World.class);
-        this.createKey("sponge:block_hit", "Block Hit", BlockSnapshot.class);
-        this.createKey("sponge:entity_hit", "Entity Hit", BlockSnapshot.class);
-        this.createKey("sponge:used_item", "Used Item", ItemStackSnapshot.class);
-        this.createKey("sponge:used_hand", "Used Hand", HandType.class);
-        this.createKey("sponge:plugin", "Plugin", PluginContainer.class);
-        this.createKey("sponge:break_event", "Break Event", ChangeBlockEvent.Break.class);
-        this.createKey("sponge:place_event", "Place Event", ChangeBlockEvent.Place.class);
-        this.createKey("sponge:modify_event", "Modify Event", ChangeBlockEvent.Modify.class);
-        this.createKey("sponge:decay_event", "Decay Event", ChangeBlockEvent.Decay.class);
-        this.createKey("sponge:grow_event", "Decay Event", ChangeBlockEvent.Grow.class);
-        this.createKey("sponge:growth_origin", "Growth Origin", BlockSnapshot.class);
+        this.createKey("block_event_queue", "Block Event Queue", LocatableBlock.class);
+        this.createKey("block_event_process", "Block Event Process", LocatableBlock.class);
+        this.createKey("creator", "Creator", User.class);
+        this.createKey("damage_type", "Damage Type", DamageType.class);
+        this.createKey("dismount_type", "Dimension Type", DismountType.class);
+        this.createKey("igniter", "Igniter", User.class);
+        this.createKey("last_damage_source", "Last Damage Source", DamageSource.class);
+        this.createKey("liquid_break", "Liquid Break", World.class);
+        this.createKey("liquid_flow", "Liquid Flow", World.class);
+        this.createKey("liquid_mix", "Liquid Mix", World.class);
+        this.createKey("neighbor_notify_source", "Neighbor Notify Source", BlockSnapshot.class);
+        this.createKey("notifier", "Notifier", User.class);
+        this.createKey("owner", "Owner", User.class);
+        this.createKey("player", "Player", Player.class);
+        this.createKey("player_simulated", "Game Profile", GameProfile.class);
+        this.createKey("projectile_source", "Projectile Source", ProjectileSource.class);
+        this.createKey("service_manager", "Service Manager", ServiceManager.class);
+        this.createKey("spawn_type", "Spawn Type", SpawnType.class);
+        this.createKey("teleport_type", "Teleport Type", TeleportType.class);
+        this.createKey("thrower", "Thrower", User.class);
+        this.createKey("weapon", "Weapon", ItemStackSnapshot.class);
+        this.createKey("fake_player", "Fake Player", Player.class);
+        this.createKey("player_break", "Player Break", World.class);
+        this.createKey("player_place", "Player Place", World.class);
+        this.createKey("fire_spread", "Fire Spread", World.class);
+        this.createKey("leaves_decay", "Leaves Decay", World.class);
+        this.createKey("piston_retract", "Piston Retract", World.class);
+        this.createKey("piston_extend", "Piston Extend", World.class);
+        this.createKey("block_hit", "Block Hit", BlockSnapshot.class);
+        this.createKey("entity_hit", "Entity Hit", BlockSnapshot.class);
+        this.createKey("used_item", "Used Item", ItemStackSnapshot.class);
+        this.createKey("used_hand", "Used Hand", HandType.class);
+        this.createKey("plugin", "Plugin", PluginContainer.class);
+        this.createKey("break_event", "Break Event", ChangeBlockEvent.Break.class);
+        this.createKey("place_event", "Place Event", ChangeBlockEvent.Place.class);
+        this.createKey("modify_event", "Modify Event", ChangeBlockEvent.Modify.class);
+        this.createKey("decay_event", "Decay Event", ChangeBlockEvent.Decay.class);
+        this.createKey("grow_event", "Decay Event", ChangeBlockEvent.Grow.class);
+        this.createKey("growth_origin", "Growth Origin", BlockSnapshot.class);
     }
 
     private void createKey(String id, String name, Class<?> usedClass) {
+        id = SpongeImpl.ECOSYSTEM_ID + ":" + id;
         this.catalogTypeMap.put(id, new SpongeEventContextKey<>(id, name, usedClass));
     }
 
     private EventContextKeysModule() {
-        super("sponge");
+        super(SpongeImpl.ECOSYSTEM_ID);
     }
 }

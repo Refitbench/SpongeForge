@@ -75,7 +75,7 @@ public final class SpongeBootstrap {
     }
 
     public static void initializeCommands() {
-        commandManager.register(SpongeImpl.getSpongePlugin(), SpongeCommandFactory.createSpongeCommand(), "sponge", "sp");
+        commandManager.register(SpongeImpl.getSpongePlugin(), SpongeCommandFactory.createSpongeCommand(), SpongeImpl.ECOSYSTEM_ID, "sp");
         commandManager.register(SpongeImpl.getSpongePlugin(), SpongeCommandFactory.createHelpCommand(), "help", "?");
         commandManager.register(SpongeImpl.getSpongePlugin(), SpongeCallbackHolder.getInstance().createCommand(), SpongeCallbackHolder.CALLBACK_COMMAND);
     }

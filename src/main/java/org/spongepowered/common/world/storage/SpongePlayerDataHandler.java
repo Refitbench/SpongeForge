@@ -57,7 +57,7 @@ import javax.annotation.Nullable;
 
 public final class SpongePlayerDataHandler {
 
-    private static final String SPONGE_DATA = "sponge";
+    private static final String SPONGE_DATA = SpongeImpl.ECOSYSTEM_ID;
     private boolean hasInitialized = false;
     private Path playerDir;
 

@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class SpongeForgeCommandFactory extends SpongeCommandFactory {
-    private static final List<String> MOD_LIST_STATICS = Lists.newArrayList("minecraft", "mcp", "FML", "forge", "spongeapi", "sponge");
+    private static final List<String> MOD_LIST_STATICS = Lists.newArrayList("minecraft", "mcp", "FML", "forge", "spongeapi", SpongeImpl.ECOSYSTEM_ID);
 
     public static CommandSpec createSpongeModsCommand() {
         return CommandSpec.builder()

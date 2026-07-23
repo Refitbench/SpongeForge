@@ -27,6 +27,7 @@ package org.spongepowered.common.registry.type.service.economy;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.service.economy.account.AccountDeletionResultType;
 import org.spongepowered.api.service.economy.account.AccountDeletionResultTypes;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.economy.SpongeAccountDeletionResultType;
 import org.spongepowered.common.registry.SpongeAdditionalCatalogRegistryModule;
 import org.spongepowered.common.registry.type.AbstractPrefixAlternateCatalogTypeRegistryModule;
@@ -37,7 +38,7 @@ public class AccountDeletionResultTypeRegistryModule
         implements SpongeAdditionalCatalogRegistryModule<AccountDeletionResultType> {
 
     public AccountDeletionResultTypeRegistryModule() {
-        super("sponge");
+        super(SpongeImpl.ECOSYSTEM_ID);
     }
 
     @Override
@@ -54,10 +55,10 @@ public class AccountDeletionResultTypeRegistryModule
 
     @Override
     public void registerDefaults() {
-        register(new SpongeAccountDeletionResultType("sponge:absent", "Absent"));
-        register(new SpongeAccountDeletionResultType("sponge:failed", "Failed"));
-        register(new SpongeAccountDeletionResultType("sponge:success", "Success"));
-        register(new SpongeAccountDeletionResultType("sponge:unsupported", "Unsupported"));
-        register(new SpongeAccountDeletionResultType("sponge:undeletable", "Undeletable"));
+        register(new SpongeAccountDeletionResultType(SpongeImpl.ECOSYSTEM_ID + ":absent", "Absent"));
+        register(new SpongeAccountDeletionResultType(SpongeImpl.ECOSYSTEM_ID + ":failed", "Failed"));
+        register(new SpongeAccountDeletionResultType(SpongeImpl.ECOSYSTEM_ID + ":success", "Success"));
+        register(new SpongeAccountDeletionResultType(SpongeImpl.ECOSYSTEM_ID + ":unsupported", "Unsupported"));
+        register(new SpongeAccountDeletionResultType(SpongeImpl.ECOSYSTEM_ID + ":undeletable", "Undeletable"));
     }
 }

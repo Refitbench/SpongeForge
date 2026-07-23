@@ -176,10 +176,10 @@ public final class SpongeImplHooks {
     public static String getModIdFromClass(final Class<?> clazz) {
         final String className = clazz.getName();
         if (className.startsWith("net.minecraft.")) {
-            return "minecraft";
+            return SpongeImpl.GAME_ID;
         }
         if (className.startsWith("org.spongepowered.")) {
-            return "sponge";
+            return SpongeImpl.ECOSYSTEM_ID;
         }
         ASMDataTable data = SpongeMod.instance.getData();
         if (data == null) {

@@ -27,6 +27,7 @@ package org.spongepowered.common.registry.type.service.economy;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.service.economy.transaction.TransactionTypes;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.economy.SpongeTransactionType;
 import org.spongepowered.common.registry.SpongeAdditionalCatalogRegistryModule;
 import org.spongepowered.common.registry.type.AbstractPrefixAlternateCatalogTypeRegistryModule;
@@ -37,7 +38,7 @@ public class TransactionTypeRegistryModule
     implements SpongeAdditionalCatalogRegistryModule<TransactionType> {
 
     public TransactionTypeRegistryModule() {
-        super("sponge");
+        super(SpongeImpl.ECOSYSTEM_ID);
     }
 
     @Override
@@ -54,8 +55,8 @@ public class TransactionTypeRegistryModule
 
     @Override
     public void registerDefaults() {
-        register(new SpongeTransactionType("sponge:deposit", "deposit"));
-        register(new SpongeTransactionType("sponge:withdraw", "withdraw"));
-        register(new SpongeTransactionType("sponge:transfer", "transfer"));
+        register(new SpongeTransactionType(SpongeImpl.ECOSYSTEM_ID + ":deposit", "deposit"));
+        register(new SpongeTransactionType(SpongeImpl.ECOSYSTEM_ID + ":withdraw", "withdraw"));
+        register(new SpongeTransactionType(SpongeImpl.ECOSYSTEM_ID + ":transfer", "transfer"));
     }
 }

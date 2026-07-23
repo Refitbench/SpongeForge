@@ -34,6 +34,7 @@ import net.minecraft.util.ResourceLocation;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.bridge.advancements.AdvancementBridge;
 import org.spongepowered.common.mixin.core.advancements.AdvancementListAccessor;
@@ -82,7 +83,7 @@ public class AdvancementRegistryModule extends AbstractPrefixCheckCatalogRegistr
     @Override
     public void registerDefaults() {
         DUMMY_ROOT_ADVANCEMENT = new net.minecraft.advancements.Advancement(
-                new ResourceLocation("sponge", "dummy_root"), null, null,
+                new ResourceLocation(SpongeImpl.ECOSYSTEM_ID, "dummy_root"), null, null,
                 AdvancementRewards.EMPTY, dummyCriteria, dummyRequirements) {
             @Override
             public void addChild(net.minecraft.advancements.Advancement child) {

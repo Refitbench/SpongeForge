@@ -134,7 +134,7 @@ public class SpongeCommandFactory {
 
     public static final String INDENT = "    ";
     public static final String LONG_INDENT = INDENT + INDENT;
-    public static final List<String> CONTAINER_LIST_STATICS = Lists.newArrayList("minecraft", "mcp", "spongeapi", "sponge");
+    public static final List<String> CONTAINER_LIST_STATICS = Lists.newArrayList("minecraft", "mcp", "spongeapi", SpongeImpl.ECOSYSTEM_ID);
 
     protected static final Text SEPARATOR_TEXT = Text.of(", ");
     static final Text INDENT_TEXT = Text.of(INDENT);
