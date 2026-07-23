@@ -55,10 +55,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.event.FMLStateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.registry.EntityEntry;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.VillagerRegistry;
+import net.minecraftforge.fml.common.registry.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.objectweb.asm.Type;
@@ -397,9 +394,15 @@ public class SpongeMod extends MetaModContainer {
 
     @SubscribeEvent
     public void onEntityRegister(RegistryEvent.Register<EntityEntry> event) {
+        int id = 0;
         for (EntityTypeRegistryModule.FutureRegistration registration : EntityTypeRegistryModule.getInstance().getCustomEntities()) {
-            EntityRegistry.registerModEntity(registration.name, registration.type, registration.name.getPath(), registration.id,
-                    registration.name.getNamespace(), 0, 0, false);
+            event.getRegistry().register(EntityEntryBuilder.create()
+                    .id(registration.name, id++)
+                    .entity(registration.type)
+                    .name(registration.name.getPath())
+                    .tracker(0, 0, false)
+                    .build()
+            );
         }
     }
 
