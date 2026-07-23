@@ -25,6 +25,7 @@
 package org.spongepowered.mod;
 
 import com.google.common.eventbus.EventBus;
+import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.MetadataCollection;
@@ -33,6 +34,7 @@ import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.SpongePlatform;
 import org.spongepowered.spongeforge.Tags;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -78,6 +80,16 @@ public final class SpongeModMetadata {
             return true;
         }
 
+        @Override
+        public File getSource() {
+            return SpongeCoremod.modFile;
+        }
+
+        @Override
+        public Class<?> getCustomResourcePackClass() {
+            return FMLFileResourcePack.class;
+        }
+
     }
 
     public static class SpongeCommonsMod extends DummyModContainer {
@@ -89,6 +101,16 @@ public final class SpongeModMetadata {
         @Override
         public boolean registerBus(EventBus bus, LoadController controller) {
             return true;
+        }
+
+        @Override
+        public File getSource() {
+            return SpongeCoremod.modFile;
+        }
+
+        @Override
+        public Class<?> getCustomResourcePackClass() {
+            return FMLFileResourcePack.class;
         }
 
     }
