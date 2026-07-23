@@ -48,6 +48,7 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
@@ -197,8 +198,7 @@ public abstract class WorldMixin implements WorldBridge {
     @Shadow public abstract WorldBorder getWorldBorder();
     @Shadow public boolean canSeeSky(final BlockPos pos) { return false; } // Shadowed
     @Shadow public abstract long getTotalWorldTime();
-    @Shadow private boolean isAreaLoaded(
-        final int xStart, final int yStart, final int zStart, final int xEnd, final int yEnd, final int zEnd, final boolean allowEmpty) { return false; } // SHADOWED
+    @Shadow protected abstract boolean isChunkLoaded(int x, int z, boolean allowEmpty);
     @Shadow public void updateEntities() { }
     @Shadow @Nullable public abstract TileEntity getTileEntity(BlockPos pos);
     @Shadow protected abstract boolean getCollisionBoxes(@Nullable Entity entityIn, AxisAlignedBB aabb, boolean p_191504_3_,
@@ -805,10 +805,64 @@ public abstract class WorldMixin implements WorldBridge {
         }
     }
 
-    @Inject(method = "isAreaLoaded(IIIIIIZ)Z", at = @At("HEAD"), cancellable = true)
-    protected void impl$useWorldServerMethodForAvoidingLookups(final int xStart, final int yStart, final int zStart, final int xEnd, final int yEnd, final int zEnd, final boolean allowEmpty,
-        final CallbackInfoReturnable<Boolean> cir) {
-        // DO NOTHING ON NON-SERVER WORLDS
+    /**
+     * @author amaranth - April 25th, 2016
+     * @reason Avoid 25 chunk map lookups per entity per tick by using neighbor pointers on server worlds
+     */
+    @Overwrite
+    public boolean isAreaLoaded(int xStart, int yStart, int zStart, int xEnd, int yEnd, int zEnd, boolean allowEmpty) {
+        if (yEnd < 0 || yStart > 255) {
+            return false;
+        }
+
+        if (!((Object) this instanceof WorldServer)) {
+            xStart = xStart >> 4;
+            zStart = zStart >> 4;
+            xEnd = xEnd >> 4;
+            zEnd = zEnd >> 4;
+            for (int i = xStart; i <= xEnd; ++i) {
+                for (int j = zStart; j <= zEnd; ++j) {
+                    if (!this.isChunkLoaded(i, j, allowEmpty)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        xStart = xStart >> 4;
+        zStart = zStart >> 4;
+        xEnd = xEnd >> 4;
+        zEnd = zEnd >> 4;
+
+        final net.minecraft.world.chunk.Chunk base = ((ChunkProviderBridge) this.shadow$getChunkProvider()).bridge$getLoadedChunkWithoutMarkingActive(xStart, zStart);
+        if (base == null) {
+            return false;
+        }
+
+        ChunkBridge currentColumn = (ChunkBridge) base;
+        for (int i = xStart; i <= xEnd; i++) {
+            if (currentColumn == null) {
+                return false;
+            }
+
+            ChunkBridge currentRow = currentColumn;
+            for (int j = zStart; j <= zEnd; j++) {
+                if (currentRow == null) {
+                    return false;
+                }
+
+                if (!allowEmpty && ((net.minecraft.world.chunk.Chunk) currentRow).isEmpty()) {
+                    return false;
+                }
+
+                currentRow = (ChunkBridge) currentRow.bridge$getNeighborChunk(1);
+            }
+
+            currentColumn = (ChunkBridge) currentColumn.bridge$getNeighborChunk(2);
+        }
+
+        return true;
     }
 
     @Override

@@ -2170,65 +2170,6 @@ public abstract class WorldServerMixin extends WorldMixin implements WorldServer
         }
     }
 
-    /**
-     * @author amaranth - April 25th, 2016
-     * @reason Avoid 25 chunk map lookups per entity per tick by using neighbor pointers
-     *
-     * @param xStart X block start coordinate
-     * @param yStart Y block start coordinate
-     * @param zStart Z block start coordinate
-     * @param xEnd X block end coordinate
-     * @param yEnd Y block end coordinate
-     * @param zEnd Z block end coordinate
-     * @param allowEmpty Whether empty chunks should be accepted
-     * @return If the chunks for the area are loaded
-     */
-    @Override
-    protected void impl$useWorldServerMethodForAvoidingLookups(int xStart, final int yStart, int zStart, int xEnd, final int yEnd, int zEnd, final boolean allowEmpty,
-        final CallbackInfoReturnable<Boolean> cir) {
-        if (yEnd < 0 || yStart > 255) {
-            cir.setReturnValue(false);
-            return;
-        }
-
-        xStart = xStart >> 4;
-        zStart = zStart >> 4;
-        xEnd = xEnd >> 4;
-        zEnd = zEnd >> 4;
-
-        final net.minecraft.world.chunk.Chunk base = ((ChunkProviderBridge) this.getChunkProvider()).bridge$getLoadedChunkWithoutMarkingActive(xStart, zStart);
-        if (base == null) {
-            cir.setReturnValue(false);
-            return;
-        }
-
-        ChunkBridge currentColumn = (ChunkBridge) base;
-        for (int i = xStart; i <= xEnd; i++) {
-            if (currentColumn == null) {
-                cir.setReturnValue(false);
-                return;
-            }
-
-            ChunkBridge currentRow = currentColumn;
-            for (int j = zStart; j <= zEnd; j++) {
-                if (currentRow == null) {
-                    cir.setReturnValue(false);
-                    return;
-                }
-
-                if (!allowEmpty && ((net.minecraft.world.chunk.Chunk) currentRow).isEmpty()) {
-                    cir.setReturnValue(false);
-                    return;
-                }
-
-                currentRow = (ChunkBridge) currentRow.bridge$getNeighborChunk(1);
-            }
-
-            currentColumn = (ChunkBridge) currentColumn.bridge$getNeighborChunk(2);
-        }
-
-        cir.setReturnValue(true);
-    }
 
     @Redirect(method = "canAddEntity", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V", remap = false))
     private void onCanAddEntityLogWarn(final Logger logger, final String message, final Object param1, final Object param2) {
