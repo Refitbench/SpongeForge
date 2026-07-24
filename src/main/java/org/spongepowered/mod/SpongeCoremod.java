@@ -52,7 +52,11 @@ public class SpongeCoremod implements IFMLLoadingPlugin {
             Mixins.registerErrorHandlerClass("org.spongepowered.mod.mixin.handler.MixinErrorHandler");
         }
 
-        Launch.classLoader.registerTransformer("zone.rong.mixinbooter.fix.forge.EagerlyLoadEventClassTransformer");
+        try {
+            String transformer = "zone.rong.mixinbooter.fix.forge.EagerlyLoadEventClassTransformer";
+            Class.forName(transformer, false, Launch.classLoader);
+            Launch.classLoader.registerTransformer(transformer);
+        } catch (ClassNotFoundException ignore) { }
 
         Launch.classLoader.addClassLoaderExclusion("org.spongepowered.api.event.Cancellable");
         Launch.classLoader.addClassLoaderExclusion("org.spongepowered.api.eventgencore.annotation.PropertySettings");
