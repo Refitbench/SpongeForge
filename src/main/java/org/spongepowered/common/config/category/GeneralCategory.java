@@ -30,14 +30,6 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 @ConfigSerializable
 public class GeneralCategory extends ConfigCategory {
 
-    @Setting(value = "plugins-dir", comment = ""
-            + "Additional directory to search for plugins, relative to the\n"
-            + "execution root or specified as an absolute path.\n"
-            + "Note that the default: '${CANONICAL_MODS_DIR}/plugins'\n"
-            + "is going to search for a plugins folder in the mods directory.\n"
-            + "If you wish for the plugins folder to reside in the root game\n"
-            + "directory, change the value to '${CANONICAL_GAME_DIR}/plugins'.")
-    private String pluginsDir = "${CANONICAL_MODS_DIR}/plugins";
     @Setting(value = "config-dir", comment = ""
             + "The directory for Sponge plugin configurations, relative to the\n"
             + "execution root or specified as an absolute path.\n"
@@ -49,12 +41,17 @@ public class GeneralCategory extends ConfigCategory {
             + "a possibility that plugin configurations can conflict the Sponge core configurations.\n")
     private String configDir = "${CANONICAL_GAME_DIR}/config";
 
+    /**
+     * Defaults to mods directory,
+     * searching in another directory is not supported as the patch is too brittle to support
+     */
+    @Deprecated
     public String pluginsDir() {
-        return this.pluginsDir;
+        return "${CANONICAL_MODS_DIR}/mods";
     }
 
     public void setPluginsDir(String pluginsDir) {
-        this.pluginsDir = pluginsDir;
+        throw new UnsupportedOperationException("Cannot set custom plugins directory!");
     }
 
     public String configDir() {

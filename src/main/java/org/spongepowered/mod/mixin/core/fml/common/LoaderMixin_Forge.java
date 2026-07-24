@@ -24,22 +24,17 @@
  */
 package org.spongepowered.mod.mixin.core.fml.common;
 
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.versioning.ArtifactVersion;
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
 import net.minecraftforge.fml.common.versioning.VersionRange;
-import net.minecraftforge.fml.relauncher.libraries.LibraryManager;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.SpongeImpl;
-import org.spongepowered.common.util.PathTokens;
 import org.spongepowered.plugin.meta.version.ComparableVersion;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -53,37 +48,7 @@ import java.util.List;
 @Mixin(value = Loader.class, remap = false)
 public abstract class LoaderMixin_Forge {
 
-    @Shadow private static File minecraftDir;
-
     private ModContainer forgeImpl$mod;
-
-    @Redirect(method = "identifyMods",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraftforge/fml/relauncher/libraries/LibraryManager;gatherLegacyCanidates(Ljava/io/File;)Ljava/util/List;",
-            remap = false
-        ),
-        remap = false
-    )
-    private List<File> discoverAndAddPluginsBeforeIterator(final File mcDir) {
-        final List<File> files = LibraryManager.gatherLegacyCanidates(minecraftDir);
-
-        final File modsFolder = new File(minecraftDir, "mods");
-        final File pluginsDir = new File(PathTokens.replace(SpongeImpl.getGlobalConfigAdapter().getConfig().getGeneral().pluginsDir()));
-        if (pluginsDir.isDirectory() && !pluginsDir.equals(modsFolder)) {
-            FMLLog.log.info("Searching %s for plugins", pluginsDir.getAbsolutePath());
-            final File[] pluginFiles = pluginsDir.listFiles((dir, name) -> name.endsWith(".jar") || name.endsWith(".zip"));
-            if (pluginFiles != null) {
-                for (final File pluginFile : pluginFiles) {
-                    if (!files.contains(pluginFile)) {
-                        FMLLog.log.debug("  Adding {} to the plugin list", pluginFile.getName());
-                        files.add(pluginFile);
-                    }
-                }
-            }
-        }
-        return files;
-    }
 
     @Redirect(method = "sortModList", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/ModContainer;getDependencies"
             + "()Ljava/util/List;", remap = false))
