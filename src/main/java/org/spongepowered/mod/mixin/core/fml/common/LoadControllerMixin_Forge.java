@@ -26,6 +26,8 @@ package org.spongepowered.mod.mixin.core.fml.common;
 
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraftforge.common.util.TextTable;
 import net.minecraftforge.fml.common.CertificateHelper;
 import net.minecraftforge.fml.common.LoadController;
@@ -39,7 +41,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.mod.bridge.fml.LoadControllerBridge_Forge;
 import org.spongepowered.mod.event.StateRegistry;
@@ -78,13 +79,16 @@ public abstract class LoadControllerMixin_Forge implements LoadControllerBridge_
         ret.append("Mods:");
     }
 
-    @Redirect(method = "printModStates", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/Loader;getModList()Ljava/util/List;"))
-    private List<ModContainer> forgeImpl$separateModsForTable(final Loader loader) {
-        return loader.getModList().stream().filter(modContainer -> !(modContainer instanceof SpongeModPluginContainer)).collect(Collectors.toList());
+    @ModifyExpressionValue(method = "printModStates",
+            at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/Loader;getModList()Ljava/util/List;"))
+    private List<ModContainer> forgeImpl$separateModsForTable(List<ModContainer> original) {
+        return original.stream()
+                .filter(modContainer -> !(modContainer instanceof SpongeModPluginContainer))
+                .collect(Collectors.toList());
     }
 
-    @Inject(method = "printModStates", at = @At("RETURN"), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    private void forgeImpl$addPluginsTable(final StringBuilder ret, final CallbackInfo ci, final TextTable table) {
+    @Inject(method = "printModStates", at = @At("RETURN"))
+    private void forgeImpl$addPluginsTable(final StringBuilder ret, final CallbackInfo ci, @Local(name = "table") final TextTable table) {
         table.clear();
 
         ret.append("\n");
