@@ -77,10 +77,10 @@ tasks.shadowJar {
     configurations = [ project.configurations.shade ]
 
     relocate 'com.typesafe.config', 'configurate.typesafe.config'
+    relocate 'javax.inject', 'org.spongepowered.libs.javax.inject'
 
     mergeServiceFiles()
 
     exclude 'META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     exclude 'LICENSE', 'LICENSE.txt', 'NOTICE'
-    exclude 'mcmod.info'
 }
