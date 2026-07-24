@@ -306,7 +306,7 @@ public class SpongeMod extends MetaModContainer {
 
     @Override
     public List<ArtifactVersion> getDependencies() {
-        return Collections.singletonList(VersionParser.parseVersionReference("mixinbooter@[11.8,)"));
+        return Collections.singletonList(VersionParser.parseVersionReference("mixinbooter@[11.5,)"));
     }
 
     @Override
