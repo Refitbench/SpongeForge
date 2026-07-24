@@ -24,27 +24,27 @@
  */
 package org.spongepowered.mod.mixin.core.forge.common.chunkio;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.world.WorldServerBridge;
 import org.spongepowered.common.bridge.world.WorldBridge;
 
-@Mixin(targets = "net.minecraftforge.common.chunkio.ChunkIOProvider", remap = false)
+@Mixin(targets = "net.minecraftforge.common.chunkio.ChunkIOProvider")
 public class ChunkIOProviderMixin_Forge {
 
-    @Shadow private Chunk chunk;
-
-    @Redirect(method = "syncCallback", at = @At(value = "FIELD", target = "Lnet/minecraft/world/gen/ChunkProviderServer;chunkGenerator:Lnet/minecraft/world/gen/IChunkGenerator;"))
-    private IChunkGenerator forgeImpl$useSpongeGen(final ChunkProviderServer provider) {
-        if (((WorldBridge) this.chunk.getWorld()).bridge$isFake()) {
-            return provider.chunkGenerator;
+    @WrapOperation(method = "syncCallback", at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/chunk/Chunk;populate(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/gen/IChunkGenerator;)V"))
+    private void useSpongeGen(Chunk chunk, IChunkProvider provider, IChunkGenerator generator, Operation<Void> original) {
+        if (((WorldBridge) chunk.getWorld()).bridge$isFake()) {
+            original.call(chunk, provider, generator);
+        } else {
+            chunk.populate(provider, ((WorldServerBridge) chunk.getWorld()).bridge$getSpongeGenerator());
         }
-        return ((WorldServerBridge) this.chunk.getWorld()).bridge$getSpongeGenerator();
     }
 
 }

@@ -24,22 +24,23 @@
  */
 package org.spongepowered.mod.mixin.core.forge.common;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraftforge.common.WorldSpecificSaveHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.world.WorldManager;
 
 import java.io.File;
 
-@Mixin(value = WorldSpecificSaveHandler.class, remap = false)
+@Mixin(WorldSpecificSaveHandler.class)
 public abstract class WorldSpecificSaveHandlerMixin_Forge {
 
-    @Shadow private File dataDir;
+    @Shadow(remap = false) private File dataDir;
 
-    @Redirect(method = "getMapFileFromName", at = @At(value = "INVOKE", target = "Ljava/io/File;mkdirs()Z", remap = false))
-    private boolean forgeImpl$onCreateDataDirectory(File dir) {
-        return WorldManager.mkdirsIfSaveable(dir);
+    @ModifyExpressionValue(method = "getMapFileFromName", at = @At(value = "INVOKE", target = "Ljava/io/File;mkdirs()Z", remap = false))
+    private boolean onCreateDataDirectory(boolean original) {
+        return WorldManager.mkdirsIfSaveable(dataDir);
     }
+
 }
