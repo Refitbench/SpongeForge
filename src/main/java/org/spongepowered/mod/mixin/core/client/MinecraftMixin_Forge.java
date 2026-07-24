@@ -107,13 +107,19 @@ public abstract class MinecraftMixin_Forge implements MinecraftBridge_Forge {
         this.kickMessage = text;
     }
 
-    @Dynamic // Forge's TerminalTransformer performs a rewrite of the System.exit(1), and we need to just inject before
+    @Dynamic
     @Inject(method = "shutdownMinecraftApplet",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraftforge/fml/common/asm/transformers/TerminalTransformer$ExitVisitor;systemExitCalled(I)V",
-            remap = false))
-    private void onShutdownDelegate(final CallbackInfo ci) {
+            remap = false), require = 0)
+    private void onForgeShutdownDelegate(final CallbackInfo ci) {
+        SpongeImpl.postShutdownEvents();
+    }
+
+    @Dynamic
+    @Inject(method = "shutdownMinecraftApplet", at = @At(value = "INVOKE", target = "Ljava/lang/System;exit(I)V", remap = false), require = 0)
+    private void onCleanroomShutdownDelegate(final CallbackInfo ci) {
         SpongeImpl.postShutdownEvents();
     }
 
