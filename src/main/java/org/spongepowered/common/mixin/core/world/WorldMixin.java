@@ -810,7 +810,7 @@ public abstract class WorldMixin implements WorldBridge {
      * @reason Avoid 25 chunk map lookups per entity per tick by using neighbor pointers on server worlds
      */
     @Overwrite
-    public boolean isAreaLoaded(int xStart, int yStart, int zStart, int xEnd, int yEnd, int zEnd, boolean allowEmpty) {
+    private boolean isAreaLoaded(int xStart, int yStart, int zStart, int xEnd, int yEnd, int zEnd, boolean allowEmpty) {
         if (yEnd < 0 || yStart > 255) {
             return false;
         }
