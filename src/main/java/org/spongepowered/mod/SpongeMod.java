@@ -114,6 +114,7 @@ import org.spongepowered.mod.inject.SpongeForgeModule;
 import org.spongepowered.mod.bridge.registry.VillagerProfessionBridge_Forge;
 import org.spongepowered.mod.network.SpongeModMessageHandler;
 import org.spongepowered.mod.plugin.MetaModContainer;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.mod.plugin.SpongeModPluginContainer;
 import org.spongepowered.mod.registry.SpongeForgeModuleRegistry;
 import org.spongepowered.mod.registry.SpongeForgeVillagerRegistry;
@@ -272,8 +273,6 @@ public class SpongeMod extends MetaModContainer {
         SpongeForgeModuleRegistry.registerForgeData();
 
         this.game.getEventManager().registerListeners(this, this);
-        SpongeImpl.getInternalPlugins().add(Sponge.getPluginManager().getPlugin("forge").orElseThrow(
-                () -> new RuntimeException("Could not find plugin container for forge")));
     }
 
     @Override
@@ -330,6 +329,11 @@ public class SpongeMod extends MetaModContainer {
     @Subscribe
     public void onConstruction(FMLConstructionEvent event) {
         this.data = event.getASMHarvestedData();
+        PluginContainer forgePlugin = Sponge.getPluginManager().getPlugin("forge")
+                .orElseGet(() -> Sponge.getPluginManager().getPlugin("cleanroom").orElse(null));
+        if (forgePlugin != null) {
+            SpongeImpl.getInternalPlugins().add(forgePlugin);
+        }
     }
 
     @Subscribe
