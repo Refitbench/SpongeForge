@@ -1,0 +1,14 @@
+{
+  "minVersion": "0.8",
+  "package": "org.spongepowered.mod.mixin.nucleus",
+  "plugin": "org.spongepowered.mod.mixin.plugin.cleanroom.CleanroomPlugin",
+  "refmap": "mixins.spongeforge.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "AbstractMessageRepositoryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
