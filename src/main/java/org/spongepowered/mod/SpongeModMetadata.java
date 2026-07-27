@@ -30,6 +30,7 @@ import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.common.ModMetadata;
+import net.minecraftforge.fml.common.versioning.VersionParser;
 import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.SpongePlatform;
 import org.spongepowered.spongeforge.Tags;
@@ -61,6 +62,10 @@ public final class SpongeModMetadata {
                 ModMetadata spongeForge = metadataCollection.getMetadataForId(Tags.MOD_ID, Collections.emptyMap());
                 ModMetadata spongeApi = metadataCollection.getMetadataForId(SpongePlatform.API_ID, Collections.emptyMap());
                 ModMetadata spongeCommons = metadataCollection.getMetadataForId(SpongeImpl.ECOSYSTEM_ID, Collections.emptyMap());
+
+                // Add dependencies
+                spongeForge.dependencies.add(VersionParser.parseVersionReference("cleanroom@[0.6.8-alpha,)"));
+                spongeForge.requiredMods.add(VersionParser.parseVersionReference("mixinbooter@[11.5,)"));
 
                 return new ModMetadata[] { spongeForge, spongeApi, spongeCommons };
             }

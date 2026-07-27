@@ -55,8 +55,6 @@ import net.minecraftforge.fml.common.event.FMLStateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.*;
-import net.minecraftforge.fml.common.versioning.ArtifactVersion;
-import net.minecraftforge.fml.common.versioning.VersionParser;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.objectweb.asm.Type;
@@ -125,8 +123,6 @@ import org.spongepowered.mod.util.StaticMixinForgeHelper;
 import zone.rong.mixinbooter.util.Environment;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -302,11 +298,6 @@ public class SpongeMod extends MetaModContainer {
         bus.register(this);
         this.controller = controller;
         return true;
-    }
-
-    @Override
-    public List<ArtifactVersion> getDependencies() {
-        return Collections.singletonList(VersionParser.parseVersionReference("mixinbooter@[11.5,)"));
     }
 
     @Override

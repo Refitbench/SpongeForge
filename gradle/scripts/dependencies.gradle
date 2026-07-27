@@ -77,7 +77,6 @@ tasks.shadowJar {
     configurations = [ project.configurations.shade ]
 
     relocate 'com.typesafe.config', 'configurate.typesafe.config'
-    relocate 'javax.inject', 'org.spongepowered.libs.javax.inject'
 
     mergeServiceFiles()
 
