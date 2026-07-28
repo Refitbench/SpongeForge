@@ -39,6 +39,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.SpongePlatform;
+import org.spongepowered.common.plugin.MinecraftPluginContainer;
 import org.spongepowered.mod.SpongeModMetadata;
 import org.spongepowered.plugin.meta.PluginDependency;
 
@@ -59,10 +60,15 @@ public class SpongeModPluginManager implements PluginManager {
         containers.put(SpongeImpl.ECOSYSTEM_ID, new ModPluginContainer(new DummyModContainer(SpongeModMetadata.SPONGE_COMMONS_METADATA)));
 
         for (ModContainer mod : Loader.instance().getModList()) {
-            PluginContainer pluginContainer = new ModPluginContainer(mod);
-            containers.put(mod.getModId(), pluginContainer);
+            containers.put(mod.getModId(), wrap(mod));
         }
+
+        containers.put(SpongeImpl.GAME_ID, MinecraftPluginContainer.INSTANCE);
         return containers;
+    }
+
+    private static PluginContainer wrap(ModContainer mod) {
+        return SpongeImpl.GAME_ID.equals(mod.getModId()) ? MinecraftPluginContainer.INSTANCE : new ModPluginContainer(mod);
     }
 
     @Override
@@ -82,11 +88,11 @@ public class SpongeModPluginManager implements PluginManager {
             return Optional.of((PluginContainer) instance);
         }
         if (instance instanceof ModContainer) {
-            return Optional.of(new ModPluginContainer((ModContainer) instance));
+            return Optional.of(wrap((ModContainer) instance));
         }
         ModContainer container = Loader.instance().getReversedModObjectList().get(instance);
         if (container != null) {
-            return Optional.of(new ModPluginContainer(container));
+            return Optional.of(wrap(container));
         }
         return Optional.empty();
     }

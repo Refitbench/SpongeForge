@@ -56,6 +56,7 @@ import org.spongepowered.common.data.property.SpongePropertyRegistry;
 import org.spongepowered.common.event.SpongeCauseStackManager;
 import org.spongepowered.common.event.SpongeEventManager;
 import org.spongepowered.common.launch.SpongeLaunch;
+import org.spongepowered.common.plugin.MinecraftPluginContainer;
 import org.spongepowered.common.registry.SpongeGameRegistry;
 import org.spongepowered.common.scheduler.SpongeScheduler;
 
@@ -90,7 +91,6 @@ public final class SpongeImpl {
     @Nullable private static SpongeConfig<TrackerConfig> trackerConfigAdapter;
     @Nullable private static SpongeConfig<CustomDataConfig> customDataConfigAdapter;
     @Nullable private static SpongeConfigSaveManager configSaveManager;
-    @Nullable private static PluginContainer minecraftPlugin;
     @Nullable private static PluginContainer spongecommon;
 
     @Inject @Nullable private static SpongeGame game;
@@ -108,11 +108,6 @@ public final class SpongeImpl {
 
     @Inject
     private static void initialize(Platform platform) {
-        if (minecraftPlugin == null) {
-            minecraftPlugin = platform.getContainer(Platform.Component.GAME);
-        }
-
-
         for (Platform.Component component : Platform.Component.values()) {
             internalPlugins.add(platform.getContainer(component));
             if (component == Platform.Component.API && platform instanceof SpongePlatform) {
@@ -176,13 +171,7 @@ public final class SpongeImpl {
     }
 
     public static PluginContainer getMinecraftPlugin() {
-        checkState(minecraftPlugin != null, "Minecraft plugin container is not initialized");
-        return minecraftPlugin;
-    }
-
-    public static void setMinecraftPlugin(PluginContainer minecraft) {
-        checkState(minecraftPlugin == null, "Minecraft plugin container is already initialized");
-        minecraftPlugin = minecraft;
+        return MinecraftPluginContainer.INSTANCE;
     }
 
     public static void setSpongePlugin(PluginContainer common) {
