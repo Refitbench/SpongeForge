@@ -27,7 +27,6 @@ package org.spongepowered.mod;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.minecraftforge.common.ForgeVersion;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.common.SpongeImplHooks;
@@ -44,14 +43,7 @@ public final class SpongeModPlatform extends SpongePlatform {
 
     @Override
     public Type getType() {
-        switch (FMLCommonHandler.instance().getSide()) {
-            case CLIENT:
-                return Type.CLIENT;
-            case SERVER:
-                return Type.SERVER;
-            default:
-                return Type.UNKNOWN;
-        }
+        return SpongeMod.isClient() ? Type.CLIENT : Type.SERVER;
     }
 
     @Override
