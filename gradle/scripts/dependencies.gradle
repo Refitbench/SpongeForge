@@ -55,7 +55,7 @@ dependencies {
     shade 'org.apache.logging.log4j:log4j-slf4j-impl:2.15.0'
     shade 'com.zaxxer:HikariCP:2.6.3'
     shade 'org.mariadb.jdbc:mariadb-java-client:2.6.0'
-    shade 'com.h2database:h2:1.4.196'
+    shade 'com.h2database:h2:2.2.224'
     shade 'org.xerial:sqlite-jdbc:3.20.0'
 
     implementation files('libs/nucleus-2.4.2-all.jar')
