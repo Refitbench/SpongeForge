@@ -40,6 +40,7 @@ public class FilteredPopulator implements FlaggedPopulatorBridge, Populator {
 
     private final Populator wrapped;
     private final List<String> requiredFlags = Lists.newArrayList();
+    private final List<String> forbiddenFlags = Lists.newArrayList();
     private final Predicate<Extent> check;
 
     public FilteredPopulator(Populator w) {
@@ -56,6 +57,20 @@ public class FilteredPopulator implements FlaggedPopulatorBridge, Populator {
         for (String f : flags) {
             this.requiredFlags.add(f);
         }
+    }
+
+    /**
+     * The populator is skipped when any of these flags is present.
+     */
+    public void setForbiddenFlags(String... flags) {
+        this.forbiddenFlags.clear();
+        for (String f : flags) {
+            this.forbiddenFlags.add(f);
+        }
+    }
+
+    private boolean matchesFlags(List<String> flags) {
+        return flags.containsAll(this.requiredFlags) && this.forbiddenFlags.stream().noneMatch(flags::contains);
     }
 
     @Override
@@ -78,7 +93,7 @@ public class FilteredPopulator implements FlaggedPopulatorBridge, Populator {
         if (!this.check.test(extent)) {
             return;
         }
-        if (!flags.containsAll(this.requiredFlags)) {
+        if (!this.matchesFlags(flags)) {
             return;
         }
         this.wrapped.populate(world, extent, rand);
@@ -89,7 +104,7 @@ public class FilteredPopulator implements FlaggedPopulatorBridge, Populator {
         if (!this.check.test(extent)) {
             return;
         }
-        if (!flags.containsAll(this.requiredFlags)) {
+        if (!this.matchesFlags(flags)) {
             return;
         }
         this.wrapped.populate(world, extent, rand, virtualBiomes);

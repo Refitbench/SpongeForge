@@ -155,19 +155,19 @@ public abstract class ChunkGeneratorOverworldMixin implements PopulatorProviderB
                 final Biome biomegenbase = this.world.getBiome(VecHelper.toBlockPos(c.getBlockMin()).add(16, 0, 16));
                 return biomegenbase != Biomes.DESERT && biomegenbase != Biomes.DESERT_HILLS;
             });
-            filtered.setRequiredFlags(WorldGenConstants.VILLAGE_FLAG);
+            filtered.setForbiddenFlags(WorldGenConstants.VILLAGE_FLAG); // Vanilla never places lakes in village chunks
             generator.getPopulators().add(filtered);
         }
 
         if (this.settings.useLavaLakes) {
             final Lake lake = Lake.builder()
                     .chance(1d / this.settings.lavaLakeChance)
-                    .liquidType((BlockState) Blocks.WATER.getDefaultState())
+                    .liquidType((BlockState) Blocks.LAVA.getDefaultState())
                     .height(VariableAmount.baseWithVariance(0,
                             VariableAmount.baseWithRandomAddition(8, VariableAmount.baseWithOptionalAddition(55, 193, 0.1))))
                     .build();
             final FilteredPopulator filtered = new FilteredPopulator(lake);
-            filtered.setRequiredFlags(WorldGenConstants.VILLAGE_FLAG);
+            filtered.setForbiddenFlags(WorldGenConstants.VILLAGE_FLAG); // Vanilla never places lakes in village chunks
             generator.getPopulators().add(filtered);
         }
 
